@@ -4,23 +4,53 @@ import java.util.stream.Stream;
 
 public final class PartInfoParser {
 
+    private static Document page;
+    private static PartInfo partInfo;
+
     public static Stream<String> parseData(Document document) {
-        String name = document.select(".item-inner-right > .label1").text();
-        String priceRaw = document.select(".primary .product-price-raw").text();
-        String priceDiscount = document.select(".primary .product-price-with-discount").text();
-        String count = document.select("#show_item-info2").text();
+        page = document;
+        partInfo = new PartInfo(
+                parseName(),
+                parsePriceRaw(),
+                parsePriceDiscounted(),
+                parseCount()
+        );
 
         final String[] details = new String[]{""};
 
-        document.select(".item.padded")
+        page.select(".item.padded")
                 .stream().forEach(i -> details[0] += String.format("\t%s\t%s", i.child(0).text(), i.child(1).text()));
 
-        document.select(".auto-models-title");
+        page.select(".auto-models-title");
 
-        String csvItem = String.format("%s\t%s\t%s\t%s\t%s%s",
-                name, priceRaw, priceDiscount, count, document.location(), details[0]);
+        String csvItem = String.format("%s%s%s",
+                partInfo.toString(), page.location(), details[0]);
 
         return Stream.of(csvItem);
+    }
+
+    private static String parseName() {
+        return page
+                .select(".item-inner-right > .label1")
+                .text();
+    }
+
+    private static String parsePriceRaw() {
+        return page
+                .select(".primary .product-price-raw")
+                .text();
+    }
+
+    private static String parsePriceDiscounted() {
+        return page
+                .select(".primary .product-price-with-discount")
+                .text();
+    }
+
+    private static String parseCount() {
+        return page
+                .select("#show_item-info2")
+                .text();
     }
 
 }

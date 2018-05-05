@@ -1,3 +1,4 @@
+import org.jsoup.helper.StringUtil;
 import org.jsoup.nodes.Document;
 
 import java.io.File;
@@ -9,9 +10,9 @@ import java.util.stream.Stream;
 
 public final class AutoAibe {
 
-    private static final String TAB = "\t";
     private static final String FIRST_URL = "https://www.autoaibe.lt/detales/stabdziu-diskai/page/1";
     private static final String FILE_NAME = "results.csv";
+    private static final boolean ONLY_FIRST_PAGE = true;
 
     public static void scrap() {
         try (PrintStream output = new PrintStream(new FileOutputStream(new File(FILE_NAME), false), true, "UTF-8")) {
@@ -37,16 +38,25 @@ public final class AutoAibe {
                 .stream()
                 .map(e -> e.attr("href"));
 
-        String nextPageUrl = page
-                .select(".top-filter-wrap .right")
-                .attr("href");
+        String nextPageUrl = parseNextPageUrl(page);
 
-        if (!nextPageUrl.isEmpty()) {
-//            Document nextDocument = getDocument(nextPageUrl).get();
-//            parsedLinks = Stream.concat(parsedLinks, scrapAllLinks(nextDocument));
+        if (!StringUtil.isBlank(nextPageUrl)) {
+            Document nextDocument = DocumentExtractor.getDocument(nextPageUrl).get();
+            parsedLinks = Stream.concat(parsedLinks, scrapAllLinks(nextDocument));
         }
 
         return parsedLinks;
+    }
+
+    private static String parseNextPageUrl(Document page) {
+        if (ONLY_FIRST_PAGE) {
+            return null;
+        }
+
+        return page
+                .select(".top-filter-wrap .right")
+                .attr("href");
+
     }
 
     private static synchronized void writeToFile(PrintStream writer, String csv) {
