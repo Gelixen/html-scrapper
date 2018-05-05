@@ -20,6 +20,8 @@ public final class AutoAibe {
             Document firstPartsPage = DocumentExtractor.getDocument(FIRST_URL)
                     .orElseThrow(() -> new RuntimeException("Could not get first page"));
 
+            writeHeader(output);
+
             scrapAllLinks(firstPartsPage)
                     .parallel()
                     .map(DocumentExtractor::getDocument)
@@ -31,6 +33,13 @@ public final class AutoAibe {
         } catch (IOException e) {
             System.err.println("Could not open " + FILE_NAME + " file, due to: " + e.getMessage());
         }
+    }
+
+    private static void writeHeader(PrintStream output) {
+        String header = "Prek\u0117\tKaina\tKaina su nuolaida\tKiekis\t" +
+                String.join("\t", PartInfoParser.PartDetailType.getAllValues()) + "URL\t";
+
+        writeToFile(output, header);
     }
 
     private static Stream<String> scrapAllLinks(Document page) {

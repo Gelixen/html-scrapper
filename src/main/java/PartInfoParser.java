@@ -61,7 +61,7 @@ public final class PartInfoParser {
                 .text();
     }
 
-    private enum PartDetailType {
+    public enum PartDetailType {
         MOUNTED_ON("Montuojama"),
         HEIGHT("Auk\u0161tis, mm"),
         THICKNESS("Storis, mm"),
@@ -94,6 +94,13 @@ public final class PartInfoParser {
             }
 
             return NO_MATCH;
+        }
+
+        public static String[] getAllValues() {
+            return Arrays
+                    .stream(values())
+                    .map(PartDetailType::getValue)
+                    .toArray(String[]::new);
         }
 
         public String getValue() {
