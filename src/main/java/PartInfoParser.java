@@ -1,5 +1,6 @@
 import org.jsoup.nodes.Document;
 
+import java.util.Arrays;
 import java.util.stream.Stream;
 
 public final class PartInfoParser {
@@ -16,15 +17,22 @@ public final class PartInfoParser {
                 parseCount()
         );
 
-        final String[] details = new String[]{""};
+        final String[] partDetails = new String[PartDetailType.values().length];
+        Arrays.fill(partDetails, "");
 
         page.select(".item.padded")
-                .stream().forEach(i -> details[0] += String.format("\t%s\t%s", i.child(0).text(), i.child(1).text()));
+                .stream()
+                .forEach(detail -> {
+                    int detailTypeIndex = PartDetailType.fromText(detail.child(0).text()).ordinal();
+                    partDetails[detailTypeIndex] = detail.child(1).text();
+                });
 
-        page.select(".auto-models-title");
+//        page.select(".auto-models-title");
 
-        String csvItem = String.format("%s%s%s",
-                partInfo.toString(), page.location(), details[0]);
+        String csvItem = String.format("%s%s\t%s",
+                partInfo.toString(), String.join("\t", partDetails), page.location());
+
+        System.out.println(csvItem);
 
         return Stream.of(csvItem);
     }
@@ -53,4 +61,43 @@ public final class PartInfoParser {
                 .text();
     }
 
+    private enum PartDetailType {
+        MOUNTED_ON("Montuojama"),
+        HEIGHT("Auk\u0161tis, mm"),
+        THICKNESS("Storis, mm"),
+        CENTER_DIAMETER("Centr.skersmuo, mm"),
+        OUTER_DIAMETER("I\u0161orinis skersmuo, mm"),
+        HOLES_COUNT("Angos"),
+        ALLOWED_MINIMUM("Leistinas minimumas, mm"),
+        TYPE("Stabd\u017ei\u0173 disko tipas"),
+        INNER_DIAMETER("\u012edubimo skersmuo, mm"),
+        BRAND("Prek\u0117s \u017eenklas"),
+        EAN_CODE("EAN kodas"),
+        REQUIRED_AMMOUNT("Reikiamas kiekis"),
+        DIAMETER("Skersmuo, mm"),
+        SURFACE("Pavir\u0161ius"),
+        BREAK_SYSTEM("Stabd\u017ei\u0173 sistema"),
+        NOTES("Pastabos"),
+        NO_MATCH("Nerasta");
+
+        private final String value;
+
+        PartDetailType(String value) {
+            this.value = value;
+        }
+
+        public static PartDetailType fromText(String text) {
+            for (PartDetailType detail : PartDetailType.values()) {
+                if (detail.getValue().equals(text)) {
+                    return detail;
+                }
+            }
+
+            return NO_MATCH;
+        }
+
+        public String getValue() {
+            return value;
+        }
+    }
 }

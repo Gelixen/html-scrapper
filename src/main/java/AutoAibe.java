@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -15,7 +16,7 @@ public final class AutoAibe {
     private static final boolean ONLY_FIRST_PAGE = true;
 
     public static void scrap() {
-        try (PrintStream output = new PrintStream(new FileOutputStream(new File(FILE_NAME), false), true, "UTF-8")) {
+        try (PrintStream output = new PrintStream(new FileOutputStream(new File(FILE_NAME), false), true, StandardCharsets.UTF_8.name())) {
             Document firstPartsPage = DocumentExtractor.getDocument(FIRST_URL)
                     .orElseThrow(() -> new RuntimeException("Could not get first page"));
 
