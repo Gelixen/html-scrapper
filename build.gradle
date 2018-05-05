@@ -1,0 +1,26 @@
+plugins {
+    id 'idea'
+    id 'java'
+    id 'application'
+}
+
+ext {
+    jsoupVersion = '1.11.3'
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+mainClassName = "Scrapper"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'org.jsoup:jsoup:$jsoupVersion'
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '4.7'
+}
