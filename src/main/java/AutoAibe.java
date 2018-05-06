@@ -37,7 +37,7 @@ public final class AutoAibe {
 
     private static void writeHeader(PrintStream output) {
         String header = "Prek\u0117\tKaina\tKaina su nuolaida\tKiekis\t" +
-                String.join("\t", PartDetailType.getAllValues()) + "URL\t";
+                String.join("\t", PartDetailType.getAllValues()) + "\tTinkama automobiliams\tURL";
 
         writeToFile(output, header);
     }
